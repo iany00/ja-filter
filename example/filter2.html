@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title></title>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+    <script type="text/javascript" src="../js/jaFilter.js"></script>
+</head>
+<body>
+
+<div id="filter" style="float: left;">
+    <div class="col-xs-6">
+        <h3 class="text-center">Stars</h3>
+        <div class="well" style="max-height: 300px;overflow: auto;">
+            <ul class="list-group checked-list-box">
+              <li><input type="checkbox" data-jafilter="star" value="1" />Star 1 - (<span>0</span>)</li>
+              <li><input type="checkbox" data-jafilter="star" value="2" />Star 2 - (<span>0</span>)</li>
+              <li><input type="checkbox" data-jafilter="star" value="3" />Star 3 - (<span>0</span>)</li>
+              <li><input type="checkbox" data-jafilter="star" value="4" />Star 4 - (<span>0</span>)</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <h3 class="text-center">Color</h3>
+        <div class="well" style="max-height: 300px;overflow: auto;">
+            <ul id="check-list-box" class="list-group checked-list-box">
+               <li><input type="checkbox" data-jafilter="color" value="1" />Color 1 - (<span>0</span>)</li>
+              <li><input type="checkbox" data-jafilter="color" value="10" />Color 10 - (<span>0</span>)</li>
+              <li><input type="checkbox" data-jafilter="color" value="20" />Color 20 - (<span>0</span>)</li>
+              <li><input type="checkbox" data-jafilter="color" value="30" />Color 30 - (<span>0</span>)</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <h3 class="text-center">Board</h3>
+        <div class="well" style="max-height: 300px;overflow: auto;">
+            <ul class="list-group checked-list-box">
+               <li><input type="checkbox" data-jafilter="board" value="1" />Board 1 - (<span>0</span>)</li>
+              <li><input type="checkbox" data-jafilter="board" value="3" />Board 3 - (<span>0</span>)</li>
+              <li><input type="checkbox" data-jafilter="board" value="7" />Board 7 - (<span>0</span>)</li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="container" style="  float: left;font-size: 15px;  margin-left: 200px;">
+    <div class="result_row" data-star="1" data-color = "1" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+        <p>star = 1 <br/>color = 1 <br/>location = 5 </p>
+    </div>
+
+    <div class="result_row" data-star="2" data-color = "10" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+         <p>star = 2 <br/>color = 10 <br/>location = 5 </p>
+    </div>
+
+    <div class="result_row" data-star="3" data-color = "1" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+         <p>star = 3 <br/>color = 1 <br/>location = 5 </p>
+    </div>
+
+    <div class="result_row" data-star="4" data-color = "1" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+        <p>star = 4 <br/>color = 1 <br/>location = 5 </p>
+    </div>
+
+    <div class="result_row" data-star="2" data-color = "20" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+         <p>star = 2 <br/>color = 20 <br/>location = 5 </p>
+    </div>
+
+    <div class="result_row" data-star="3" data-color = "30" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+         <p>star = 3 <br/>color = 30 <br/>location = 5 </p>
+    </div>
+
+    <div class="result_row" data-star="3" data-color = "10" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+         <p>star = 3 <br/>color = 10 <br/>location = 5 </p>
+    </div>
+
+    <div class="result_row" data-star="4" data-color = "1" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+         <p>star = 4 <br/>color = 1 <br/>location = 5 </p>
+    </div>
+
+    <div class="result_row" data-star="2" data-color = "10" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+         <p>star = 1 <br/>color = 1 <br/>location = 5 </p>
+    </div>
+
+    <div class="result_row" data-star="3" data-color = "30" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+        <p>star = 3 <br/>color = 30 <br/>location = 5 </p>
+        <ul class="innerData">
+            <li class="innerRow" data-board = "3"> <p>board = 3 </p></li>
+            <li class="innerRow" data-board = "1"> <p>board = 1 </p></li>
+            <li class="innerRow" data-board = "7"> <p>board = 7 </p></li>
+        </ul>
+    </div>
+
+    <div class="result_row" data-star="1" data-color = "10" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
+        <p>star = 1 <br/>color = 10 <br/>location = 5 </p>
+        <ul class="innerData">
+            <li class="innerRow" data-board = "3"> <p>board = 3 </p></li>
+            <li class="innerRow" data-board = "1"> <p>board = 1 </p></li>
+        </ul>
+    </div>
+
+
+</div>
+<script type="text/javascript">
+    $('#filter').jaFilter({
+        containerId     : '#container',
+        rows            : '.result_row',
+        filtersInDepth  : 'board',
+        countInDepth    : 'board'
+    });
+
+</script>
+
+</body>
+</html>
