@@ -1,5 +1,18 @@
 /**
- * Created by Ionut Airinei on 3/16/2015.
+ *
+ * Copyright (c) 2015 Ionut Airinei
+ *
+ * Content filtering - jaFilter
+ *
+ * documentation at https://github.com/iany00/ja-filter
+ *
+ * allows content divs to be filtered (made invisible) under a specific format
+ * <code>
+ *      $('#filter').jaFilter({
+ *       containerId     : '#container',
+ *       rows            : '.result_row',
+ *   });
+ * </code>
  */
 
 (function ($)

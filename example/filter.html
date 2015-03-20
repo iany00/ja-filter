@@ -14,10 +14,10 @@
         <h3 class="text-center">Stars</h3>
         <div class="well" style="max-height: 300px;overflow: auto;">
             <ul class="list-group checked-list-box">
-              <li><input type="checkbox" data-jafilter="star" value="1" />Star 1 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="star" value="2" />Star 2 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="star" value="3" />Star 3 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="star" value="4" />Star 4 - (<span>0</span>)</li>
+              <li><input type="checkbox" data-jafilter="star" value="1" />Star 1 - (<span class="count">0</span>)</li>
+              <li><input type="checkbox" data-jafilter="star" value="2" />Star 2 - (<span class="count">0</span>)</li>
+              <li><input type="checkbox" data-jafilter="star" value="3" />Star 3 - (<span class="count">0</span>)</li>
+              <li><input type="checkbox" data-jafilter="star" value="4" />Star 4 - (<span class="count">0</span>)</li>
             </ul>
         </div>
     </div>
@@ -25,10 +25,10 @@
         <h3 class="text-center">Color</h3>
         <div class="well" style="max-height: 300px;overflow: auto;">
             <ul id="check-list-box" class="list-group checked-list-box">
-               <li><input type="checkbox" data-jafilter="color" value="1" />Color 1 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="color" value="10" />Color 10 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="color" value="20" />Color 20 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="color" value="30" />Color 30 - (<span>0</span>)</li>
+               <li><input type="checkbox" data-jafilter="color" value="1" />Color 1 - (<span class="count">0</span>)</li>
+              <li><input type="checkbox" data-jafilter="color" value="10" />Color 10 - (<span class="count">0</span>)</li>
+              <li><input type="checkbox" data-jafilter="color" value="20" />Color 20 - (<span class="count">0</span>)</li>
+              <li><input type="checkbox" data-jafilter="color" value="30" />Color 30 - (<span class="count">0</span>)</li>
             </ul>
         </div>
     </div>
@@ -36,9 +36,9 @@
         <h3 class="text-center">Board</h3>
         <div class="well" style="max-height: 300px;overflow: auto;">
             <ul class="list-group checked-list-box">
-               <li><input type="checkbox" data-jafilter="board" value="1" />Board 1 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="board" value="3" />Board 3 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="board" value="7" />Board 7 - (<span>0</span>)</li>
+               <li><input type="checkbox" data-jafilter="board" value="1" />Board 1 - (<span class="count">0</span>)</li>
+              <li><input type="checkbox" data-jafilter="board" value="3" />Board 3 - (<span class="count">0</span>)</li>
+              <li><input type="checkbox" data-jafilter="board" value="7" />Board 7 - (<span class="count">0</span>)</li>
 
             </ul>
         </div>
@@ -102,14 +102,8 @@
 
 </div>
 <script type="text/javascript">
-//    $('#filter').jaFilter({
-//        containerId     : '#container',
-//        rows            : '.result_row',
-//        noRecount       : 'star',
-//        filtersInDepth  : 'board',
-//        countInDepth    : 'board'
-//    });
 
+// Custom (extra) filter for each element
 var boardFilter = function($el)
 {
     var checkedBoxes = [];
