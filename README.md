@@ -1,4 +1,4 @@
-#jQury Content Filtering (jaFilter)
+#jQuery Content Filtering (jaFilter)
    - A jQuery plugin for content filtering
 
 ##Instructions
@@ -20,10 +20,10 @@ $('#filter').jaFilter({
 ```
 
 arguments:
-
+```
    * containerId // Container id that has the elements you want to filter
    * rows       // Container class that has data attributes for filtering
-
+```
 optional arguments:
 ```
     * noRecount               // No recounts on specific data element(s); e.g noRecount:['filter1', 'filter2']
