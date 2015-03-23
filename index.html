@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Ja-filter by iany00</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Ja-filter</h1>
+        <p>Content filtering (jQuery)</p>
+
+        <p class="view"><a href="https://github.com/iany00/ja-filter">View the Project on GitHub <small>iany00/ja-filter</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/iany00/ja-filter/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/iany00/ja-filter/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/iany00/ja-filter">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="jquery-content-filtering-jafilter" class="anchor" href="#jquery-content-filtering-jafilter" aria-hidden="true"><span class="octicon octicon-link"></span></a>jQuery Content Filtering (jaFilter)</h1>
+
+<ul>
+<li>A jQuery plugin for content filtering</li>
+</ul>
+
+<h2>
+<a id="instructions" class="anchor" href="#instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Instructions</h2>
+
+<ol>
+<li>Include the latest version of jQuery</li>
+<li>Include the plugin script</li>
+<li>Instantiate the plugin on an element that contains sub-elements with data &amp; value attribute, and pass the element you want to filter as the parameter. See the <code>filter.html, filter2.html</code> file for a simple example.</li>
+</ol>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>usage</h2>
+
+<div class="highlight highlight-javascript"><pre>
+$(<span class="pl-s"><span class="pl-pds">'</span>#filter<span class="pl-pds">'</span></span>).jaFilter({
+    containerId     <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>#container<span class="pl-pds">'</span></span>,
+    rows            <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>.result_row<span class="pl-pds">'</span></span>
+    });</pre></div>
+
+<p>arguments:</p>
+
+<pre><code>   * containerId // Container id that has the elements you want to filter
+   * rows       // Container class that has data attributes for filtering
+</code></pre>
+
+<p>optional arguments:</p>
+
+<pre><code>    * noRecount               // No recounts on specific data element(s); e.g noRecount:['filter1', 'filter2']
+    * filtersInDepth          // In case you have sub-filters; see example "filter2.html"
+    * countInDepth            // In case you have sub-filters; see example "filter2.html"
+    * otherFilters            // In case you want to add a custom filter. see example "filter.html". This applies for each element
+    * hideOnlyAvailableData   // Set this to true when some elements doesn't have a data for filtering set (or has a depth filter) and you want to show them
+    * jaAttribute             // You can change the default data attribute 'jafilter'
+    * notInRange              // You can change the default class for hidden elements 'notInFilterRange',
+</code></pre>
+
+<h2>
+<a id="warning" class="anchor" href="#warning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Warning:</h2>
+
+<ul>
+<li>expects filter to have elements with 'data-jafilter=["FILTER_NAME"]' and 'value = ["FILTER_VALUE"]'</li>
+<li>expects elements you want to filter to have 'data-["FILTER_NAME"] = ["FILTER_VALUE"]'</li>
+</ul>
+
+<hr>
+
+<h2>
+<a id="fiddle-demo" class="anchor" href="#fiddle-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fiddle Demo:</h2>
+
+<ul>
+<li><a href="https://jsfiddle.net/jsbd39w4/">https://jsfiddle.net/jsbd39w4/</a></li>
+<li><a href="https://jsfiddle.net/6r69ac2s/">https://jsfiddle.net/6r69ac2s/</a></li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/iany00">iany00</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
