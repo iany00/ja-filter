@@ -3,6 +3,7 @@
  * Copyright (c) 2015 Ionut Airinei
  *
  * Content filtering - jaFilter
+ * Version 0.2
  *
  * documentation at https://github.com/iany00/ja-filter
  *
@@ -21,22 +22,34 @@
 
     var namespace = '.jaFilter',
         defaults = {
-            events        : 'change',
-            containerId   : null,
-            rows          : null,
-            noRecount     : null,
-            activeFilters : [],
-            filtersInDepth: [],
-            countInDepth  : [],
-            otherFilters  : [],
-            jaAttribute   : 'jafilter',
-            notInRange    : 'notInFilterRange',
-            hideOnlyAvailableData : false,
-            callback      : function (e)
+            events               : 'change',
+            containerId          : null,
+            rows                 : null, // string; class name
+            neverRecount         : null, // array; don\t recount elements on specific categories
+            categoryRecount      : true, // boolean; recount elements on selected category
+            noEmptyFilters       : true,
+            visibleFilters       : [],
+            filtersInDepth       : [],
+            countInDepth         : [],
+            extraFilters         : [],
+            jaAttribute          : 'jafilter',
+            notInRange           : 'notInFilterRange',
+            hideOnlyAvailableData: false,
+
+            // * Do not change this
+            activeFilters        : [],
+            filterCounter        : [],
+            visibleRows          : 0,
+            onClickCategory      : null,
+            before               : function(e)
             {
                 //
             },
-            done          : function (success)
+            callback             : function (e)
+            {
+                //
+            },
+            done                 : function (success)
             {
                 //
             }
@@ -44,27 +57,32 @@
         filters = {
             filter                  : function (options)
             {
+                // Filter options and defaults
                 var notInRange = options.notInRange,
-                    success = true,
-                    callback = options.callback;
+                    success     = true,
+                    callback    = options.callback;
 
-                options.activeFilters = $.extend ({}, options.activeFilters);
+                defaults.visibleRows = 0;
+                options.activeFilters = $.extend({}, options.activeFilters);
 
-                options.$rows
-                    .filter (function ()
+                /* ==========================================
+                * Here we apply filters for each selected items
+                * Depth & Extra filter are applied if they are set
+                * Attribute counter starts after all filters are applied
+                * ==========================================
+                * */
+                options.$rows.filter(function ()
                 {
-                    var itemRow = $ (this);
-                    var itemData = $ (this).data ();
+                    var itemRow  = $(this);
+                    var itemData = $(this).data();
                     var inFilterRange = true;
 
-                    $.each (options.activeFilters, function (key, value)
+                    // if not in filter range, stop & hide the item
+                    $.each(options.activeFilters, function (key, value)
                     {
-                        /*
-                         * if not in filter range, stop & hide the item
-                         * */
-                        if (options.filtersInDepth.length > 0 && $.inArray (key, options.filtersInDepth) != -1) // depth filters
+                        if (options.filtersInDepth.length > 0 && $.inArray(key, options.filtersInDepth) != -1) // depth filters
                         {
-                            inFilterRange = filters.depthFilter (itemRow, key, options);
+                            inFilterRange = filters.depthFilter(itemRow, key, options);
                             if (!inFilterRange)
                             {
                                 return false;
@@ -74,48 +92,76 @@
                         {
                             if (options.activeFilters[key].length > 0)
                             {
-                                if(typeof itemData[key] == "undefined" && options.hideOnlyAvailableData)
+                                if (typeof itemData[key] == "undefined" && options.hideOnlyAvailableData)
                                 {
                                     inFilterRange = true;
                                 }
-                                else
-                                if ($.inArray (itemData[key], value) == -1)
+
+                                // in case we have data with multiple values use split
+                                var arrData = [];
+                                if(typeof itemData[key] === 'string')
                                 {
+                                    arrData = itemData[key].split(",").map(function (e) {
+                                        var intValue = parseInt(e, 10);
+                                        return (isNaN(intValue) ? e : intValue);
+                                    });
                                     inFilterRange = false;
-                                    return false;
-                                }
-                                else
-                                {
-                                    inFilterRange = true;
+                                    $.each(value, function(k, v) {
+                                        if(arrData.indexOf(v) != -1)
+                                        {
+                                            inFilterRange = true;
+                                            return false;
+                                        }
+                                    });
+                                    return inFilterRange;
+                                } else {
+                                    if ($.inArray(itemData[key], value) == -1)
+                                    {
+                                        inFilterRange = false;
+                                        return false;
+                                    } else {
+                                        inFilterRange = true;
+                                    }
                                 }
                             }
                         }
                     });
 
                     // Add extra filters
-                    if (options.otherFilters.length > 0)
+                    /*
+                     ===  Do not execute extra filters if element failed in previous filter ===
+                    */
+                    if (options.extraFilters.length > 0 && inFilterRange)
                     {
-                        if (typeof options.otherFilters === 'string')
+                        if (typeof options.extraFilters === 'string')
                         {
-                            options.otherFilters = [options.otherFilters];
+                            options.extraFilters = [options.extraFilters];
                         }
 
-                        $.each (options.otherFilters, function (key,_filter)
+                        $.each(options.extraFilters, function (key, _filter)
                         {
-                            _filter.apply (this, [itemRow]);
+                            var found = _filter.apply(this, [itemRow]);
+                            if(!found)
+                            {
+                                inFilterRange = found;
+                            }
                         });
-
                     }
 
                     if (!inFilterRange)
                     {
                         return true;
                     }
-                    $ (this).removeClass (notInRange);
 
-                }).addClass (notInRange);
+                    $(this).removeClass(notInRange);
 
-                this.countAttributesForFilter (options, 'onfilter');
+                    defaults.visibleRows++;
+
+                }).addClass(notInRange);
+
+                callback(this, success, options);
+
+                this.countAttributesForFilter(options, 'onfilter');
 
                 return success;
 
@@ -123,26 +169,27 @@
             depthFilter             : function (itemRow, dataAttr, options)
             {
                 var notInRange = options.notInRange;
-                var inFilterRange = true;
+                var inFilterRange = false;
 
-                itemRow.find ('[data-' + dataAttr + ']').each (function ()
+                itemRow.find('[data-' + dataAttr + ']').each(function ()
                 {
+                    var $this = $(this);
 
-                    var $this = $ (this);
-                    var thisData = $this.data (dataAttr);
+                    var dataAttrC = dataAttr.replace('\\',''); //*fix for data at using dot*/
+                    var thisData = $this.data(dataAttrC);
 
                     if (options.activeFilters[dataAttr].length == 0) // When filter is selected
                     {
-                        $this.removeClass (notInRange);
+                        $this.removeClass(notInRange);
                         inFilterRange = true;
                     }
-                    else if ($.inArray (thisData, options.activeFilters[dataAttr]) == -1)
+                    else if ($.inArray(thisData, options.activeFilters[dataAttr]) == -1)
                     {
-                        $this.addClass (notInRange);
+                        $this.addClass(notInRange);
                     }
                     else
                     {
-                        $this.removeClass (notInRange);
+                        $this.removeClass(notInRange);
                         inFilterRange = true;
                     }
                 });
@@ -153,11 +200,11 @@
             {
                 // Count data
                 var categoriesCnt = [];
-                options.$rows.not ('.' + options.notInRange).each (function ()
+                options.$rows.not('.' + options.notInRange).each(function ()
                 {
-                    var $thisRow = $ (this);
-                    var thisData = $ (this).data ();
-                    $.each (thisData, function (key, value)
+                    var $thisRow = $(this);
+                    var thisData = $(this).data();
+                    $.each(thisData, function (key, value)
                     {
                         if (typeof categoriesCnt[key] == "undefined")
                         {
@@ -176,11 +223,12 @@
 
                     if (options.countInDepth.length > 0)
                     {
-                        $.each (options.countInDepth, function (key, dataAttr)
+                        $.each(options.countInDepth, function (key, dataAttr)
                         {
-                            $thisRow.find ('[data-' + dataAttr + ']').not ('.' + options.notInRange).each (function ()
+                            $thisRow.find('[data-' + dataAttr + ']').not('.' + options.notInRange).each(function ()
                             {
-                                var value = $ (this).data (dataAttr);
+                                var dataAttrC = dataAttr.replace('\\',''); //*---*/
+                                var value = $(this).data(dataAttrC);
                                 if (typeof categoriesCnt[dataAttr] == "undefined")
                                 {
                                     categoriesCnt[dataAttr] = [];
@@ -195,57 +243,94 @@
                                 }
                             });
                         });
-
                     }
-
                 });
 
-                if (typeof  options.noRecount === 'string')
+                defaults.filterCounter = categoriesCnt;
+
+                filters.setAttributeCount(categoriesCnt, action);
+            },
+            setAttributeCount: function(categoriesCnt, action)
+            {
+                var options = defaults;
+                if (typeof  options.neverRecount === 'string')
                 {
-                    options.noRecount = [options.noRecount];
+                    options.neverRecount = [options.neverRecount];
                 }
 
                 // Set counted data
-                options.$selector.find ('[type="checkbox"]').each (function ()
+                options.$selector.find('[type="checkbox"]').each(function ()
                 {
-                    var attr = $ (this).data (options.jaAttribute);
+                    var attr = $(this).data(options.jaAttribute);
 
-                    if ($.inArray (attr, options.noRecount) != -1 && action != 'init')
+                    /*Add filter counter*/
+                    if (($.inArray(attr, options.neverRecount) != -1 && action != 'init')
+                            || (options.categoryRecount === true && options.onClickCategory == attr))
                     {
-                        // do nothing ..
+                        // do nothing??
                     }
                     else
                     {
-                        var value = $ (this).val ();
+                        var value = $(this).val();
                         var cnt;
 
-                        if (typeof categoriesCnt[attr] == "undefined" || typeof categoriesCnt[attr][value] == "undefined")
-                        {
+                        if (typeof categoriesCnt[attr] == "undefined" || typeof categoriesCnt[attr][value] == "undefined") {
                             cnt = 0;
                         }
-                        else
-                        {
+                        else {
                             cnt = categoriesCnt[attr][value];
                         }
 
-                        $ (this).next ().text (cnt);
+
+                        var labelFor = '[for="' + $(this).attr('id') + '"]';
+                        if (typeof $(labelFor) === "undefined")
+                        {   // Add counter in next tag
+                            $(this).next().text(cnt);
+                        }
+                        else
+                        {   // Add the counter in label based on input id
+                            $(labelFor).find('span').text(cnt);
+                        }
+
+                        // Hide filters that has 0 counted elements
+                        if($.isArray(options.noEmptyFilters)
+                            && $.inArray(attr, options.noEmptyFilters) != -1
+                            && cnt == 0
+                            || options.noEmptyFilters == false)
+                        {
+                            $(this).parent().hide();
+                            $(labelFor).hide();
+                            $(labelFor).next().hide();
+                        }
+                        else { // or show them
+                            $(labelFor).show();
+                            $(this).parent().show();
+                            $(labelFor).next().show();
+                        }
+
+                        // Exceptions
+                        if($.inArray(attr, options.visibleFilters) != -1)
+                        {
+                            $(labelFor).show();
+                            $(this).parent().show();
+                            $(labelFor).next().show();
+                        }
+
                     }
                 });
-
-
             }
         },
         methods = {
-            make   : function (options)
+            make       : function (options)
             {
-
+                /* === Filter options ===*/
                 if (options === 'undefined')
                 {
-                    $.error ('jQuery' + namespace + ' may not be initialized without options.');
+                    $.error('jQuery' + namespace + ' may not be initialized without options.');
                 }
 
-                options = $.extend ({}, defaults, options);
-                options.events = options.events.replace (/(\w+)/g, "$1" + namespace + " ");
+                options = $.extend({}, defaults, options);
+                options.events = options.events.replace(/(\w+)/g, "$1" + namespace + " ");
 
                 var html = '<style type = "text/css">.' + options.notInRange + '{display:none!important;}</style>';
                 $(html).appendTo("head");
@@ -260,95 +345,151 @@
                     options.countInDepth = [options.countInDepth];
                 }
 
+                // Cache selectors
+                options.$containerId = $(options.containerId);
+                options.$rows        = $(options.containerId).find(options.rows);
 
-                /*******/
-                this.each (function ()
+                /* === Filter events init ===*/
+                this.each(function () // in case of multiple filters
                 {
+                    options.$selector       = $(this);
+                    options.checkboxFilters = $(this).find('[type="checkbox"]');
 
-                    // Cache selectors
-                    options.$selector = $ (this);
-                    options.$containerId = $ (options.containerId);
-                    options.$rows = $ (options.containerId).find (options.rows);
-
-                    // Creat active filter array
-                    $ (this).find ('[type="checkbox"]').each (function ()
+                    // Create active filter array
+                    $(this).find('[type="checkbox"]').each(function ()
                     {
-                        var attr = $ (this).data (options.jaAttribute);
+                        var attr = $(this).data(options.jaAttribute);
                         options.activeFilters[attr] = [];
                     });
 
-                    filters.countAttributesForFilter (options, 'init');
+                    // Set cache
+                    methods.setCache(options);
 
-                    $ (this).find ('[type="checkbox"]').on (options.events, function ()
+                    filters.countAttributesForFilter(options, 'init');
+
+                    options.checkboxFilters.on(options.events, function ()
                     {
+                        if(options.before) {
+                            options.before(true);
+                        }
 
                         var success;
 
-                        // Get data attr and value
-                        var filterAttributes = $ (this).data (options.jaAttribute);
-                        var filterValue = parseInt ($ (this).val ());
+                        if($(this).is(':checked'))
+                            defaults.onClickCategory = $(this).data('jafilter');
 
+                        // Set active filters
+                        options = methods.setActiveFilters(this, options);
 
-                        // Create active filters
-                        if ($ (this).is (':checked'))
-                        {
-                            options.activeFilters[filterAttributes].push (filterValue);
-
-                        }
-                        else
-                        {
-                            var arrIndex = $.inArray( filterValue, options.activeFilters[filterAttributes] );
-                            options.activeFilters[filterAttributes].splice (arrIndex, 1);
-                        }
-
-                        success = filters.filter (options);
+                        success = filters.filter(options);
 
                         if (options.done)
                         {
-                            options.done (success);
+                            defaults.onClickCategory = null;
+                            options.done(success);
                         }
 
                     });
 
                 });
+
 
                 return this;
 
             },
-            destroy: function ()
+            setActiveFilters: function(that, options)
             {
+                // Get data attr and value
+                var filterAttributes = $(that).data(options.jaAttribute);
+                var thisValue        = $(that).val();
+                var filterValue      = (isNaN(parseInt(thisValue, 10)) ? thisValue : parseInt(thisValue, 10));
 
-                this.each (function ()
+                // Create active filters
+                if (typeof filterAttributes !== "undefined")
                 {
+                    if ($(that).is(':checked'))
+                    {
+                        options.activeFilters[filterAttributes].push(filterValue);
+                    }
+                    else
+                    {
+                        var arrIndex = $.inArray(filterValue, options.activeFilters[filterAttributes]);
+                        if (arrIndex > -1)
+                        {
+                            options.activeFilters[filterAttributes].splice(arrIndex, 1);
+                        }
 
-                    $ (this).off (namespace);
+                    }
+                }
 
+                return options;
+            },
+            resetCache : function ()
+            {
+                defaults.$containerId = $(defaults.containerId);
+                defaults.$rows        = $(defaults.containerId).find(defaults.rows);
+            },
+            /*=== Get Cache ===*/
+            getCache: function (resetCache)
+            {
+                if(resetCache || typeof resetCache === "undefined")
+                    methods.resetCache();
+
+                return defaults;
+            },
+            setCache: function (options)
+            {
+                defaults = $.extend({}, defaults, options);
+            },
+            recount    : function ()
+            {
+                methods.resetCache();
+                filters.countAttributesForFilter(defaults, 'onfilter');
+            },
+            restartFilter : function()
+            {
+                var options = defaults;
+                defaults.checkboxFilters.each(function ()
+                {
+                    // Set active filters
+                    options = methods.setActiveFilters(this, defaults);
+                });
+
+                var success = filters.filter(options);
+
+                if (options.done)
+                {
+                    options.done(success);
+                }
+            },
+            destroy    : function ()
+            {
+                this.each(function ()
+                {
+                    $(this).off(namespace);
                 });
 
                 return this;
-
             }
-
         };
 
 
     $.fn.jaFilter = function (method)
     {
-
         if (methods[method])
         {
-            return methods[method].apply (this, Array.prototype.slice.call (arguments, 1));
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         }
         else if (typeof method === 'object' || !method)
         {
-            return methods.make.apply (this, arguments);
+            return methods.make.apply(this, arguments);
         }
         else
         {
-            $.error ('Method ' + method + ' does not exist on jQuery' + namespace);
+            $.error('Method ' + method + ' does not exist on jQuery' + namespace);
         }
 
         return this;
     };
 
-} (jQuery));
+}(jQuery));
