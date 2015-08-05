@@ -3,7 +3,6 @@
  * Copyright (c) 2015 Ionut Airinei
  *
  * Content filtering - jaFilter
- * Version 0.2
  *
  * documentation at https://github.com/iany00/ja-filter
  *
@@ -159,7 +158,7 @@
 
                 }).addClass(notInRange);
 
-                callback(this, success, options);
+                //callback(this, success, options);
 
                 this.countAttributesForFilter(options, 'onfilter');
 
@@ -199,7 +198,7 @@
             countAttributesForFilter: function (options, action)
             {
                 // Count data
-                var categoriesCnt = [];
+                var categoriesCnt = {};
                 options.$rows.not('.' + options.notInRange).each(function ()
                 {
                     var $thisRow = $(this);
@@ -208,7 +207,7 @@
                     {
                         if (typeof categoriesCnt[key] == "undefined")
                         {
-                            categoriesCnt[key] = [];
+                            categoriesCnt[key] = {};
                         }
                         if (typeof categoriesCnt[key][value] != "undefined")
                         {
@@ -231,13 +230,13 @@
                                 var value = $(this).data(dataAttrC);
                                 if (typeof categoriesCnt[dataAttr] == "undefined")
                                 {
-                                    categoriesCnt[dataAttr] = [];
+                                    categoriesCnt[dataAttr] = {};
                                 }
-                                if (typeof categoriesCnt[dataAttr][value] != "undefined")
+                                if (typeof categoriesCnt[dataAttr][value] != "undefined" && value != 0 && value != '')
                                 {
                                     categoriesCnt[dataAttr][value] += 1;
                                 }
-                                else
+                                else if(value != 0 && value != '')
                                 {
                                     categoriesCnt[dataAttr][value] = 1;
                                 }
@@ -264,7 +263,7 @@
                     var attr = $(this).data(options.jaAttribute);
 
                     /*Add filter counter*/
-                    if (($.inArray(attr, options.neverRecount) != -1 && action != 'init')
+                    if ((action != 'init' && options.neverRecount != null && $.inArray(attr, options.neverRecount) != -1 )
                             || (options.categoryRecount === true && options.onClickCategory == attr))
                     {
                         // do nothing??
@@ -274,22 +273,21 @@
                         var value = $(this).val();
                         var cnt;
 
-                        if (typeof categoriesCnt[attr] == "undefined" || typeof categoriesCnt[attr][value] == "undefined") {
+                        if (typeof categoriesCnt[attr] === "undefined" || typeof categoriesCnt[attr][value] === "undefined") {
                             cnt = 0;
                         }
                         else {
                             cnt = categoriesCnt[attr][value];
                         }
 
-
-                        var labelFor = '[for="' + $(this).attr('id') + '"]';
-                        if (typeof $(labelFor) === "undefined")
+                        var $labelFor = options.$selector.find('[for="' + $(this).attr('id') + '"]');
+                        if (typeof $labelFor === "undefined")
                         {   // Add counter in next tag
                             $(this).next().text(cnt);
                         }
                         else
                         {   // Add the counter in label based on input id
-                            $(labelFor).find('span').text(cnt);
+                            $labelFor.find('span').text(cnt);
                         }
 
                         // Hide filters that has 0 counted elements
@@ -299,23 +297,22 @@
                             || options.noEmptyFilters == false)
                         {
                             $(this).parent().hide();
-                            $(labelFor).hide();
-                            $(labelFor).next().hide();
+                            $labelFor.hide();
+                            $labelFor.next().hide();
                         }
                         else { // or show them
-                            $(labelFor).show();
+                            $labelFor.show();
                             $(this).parent().show();
-                            $(labelFor).next().show();
+                            $labelFor.next().show();
                         }
 
                         // Exceptions
-                        if($.inArray(attr, options.visibleFilters) != -1)
+                        if(options.visibleFilters.length > 0 && $.inArray(attr, options.visibleFilters) != -1)
                         {
-                            $(labelFor).show();
+                            $labelFor.show();
                             $(this).parent().show();
-                            $(labelFor).next().show();
+                            $labelFor.next().show();
                         }
-
                     }
                 });
             }
@@ -329,64 +326,67 @@
                     $.error('jQuery' + namespace + ' may not be initialized without options.');
                 }
 
-                options = $.extend({}, defaults, options);
-                options.events = options.events.replace(/(\w+)/g, "$1" + namespace + " ");
+                defaults = $.extend({}, defaults, options);
+                defaults.events = defaults.events.replace(/(\w+)/g, "$1" + namespace + " ");
 
-                var html = '<style type = "text/css">.' + options.notInRange + '{display:none!important;}</style>';
+                var html = '<style type = "text/css">.' + defaults.notInRange + '{display:none!important;}</style>';
                 $(html).appendTo("head");
 
-                if (typeof options.filtersInDepth === 'string')
+                if (typeof defaults.filtersInDepth === 'string')
                 {
-                    options.filtersInDepth = [options.filtersInDepth];
+                    defaults.filtersInDepth = [defaults.filtersInDepth];
                 }
 
-                if (typeof options.countInDepth === 'string')
+                if (typeof defaults.countInDepth === 'string')
                 {
-                    options.countInDepth = [options.countInDepth];
+                    defaults.countInDepth = [defaults.countInDepth];
                 }
 
                 // Cache selectors
-                options.$containerId = $(options.containerId);
-                options.$rows        = $(options.containerId).find(options.rows);
+                defaults.$containerId = $(defaults.containerId);
+                defaults.$rows        = $(defaults.containerId).find(defaults.rows);
 
                 /* === Filter events init ===*/
                 this.each(function () // in case of multiple filters
                 {
-                    options.$selector       = $(this);
-                    options.checkboxFilters = $(this).find('[type="checkbox"]');
+                    defaults.$selector       = $(this);
+                    defaults.checkboxFilters = $(this).find('[type="checkbox"]');
 
                     // Create active filter array
                     $(this).find('[type="checkbox"]').each(function ()
                     {
-                        var attr = $(this).data(options.jaAttribute);
-                        options.activeFilters[attr] = [];
+                        var attr = $(this).data(defaults.jaAttribute);
+                        defaults.activeFilters[attr] = [];
                     });
 
                     // Set cache
-                    methods.setCache(options);
+                    methods.setCache(defaults);
 
-                    filters.countAttributesForFilter(options, 'init');
+                    filters.countAttributesForFilter(defaults, 'init');
 
-                    options.checkboxFilters.on(options.events, function ()
+                    // start to filter on event
+                    defaults.checkboxFilters.on(defaults.events, function ()
                     {
-                        if(options.before) {
-                            options.before(true);
+                        if(defaults.before) {
+                            defaults.before();
                         }
 
                         var success;
 
-                        if($(this).is(':checked'))
-                            defaults.onClickCategory = $(this).data('jafilter');
+                        // flag the checked category
+                        if($(this).is(':checked')) {
+                            defaults.onClickCategory = $(this).data(defaults.jaAttribute);
+                        }
 
                         // Set active filters
-                        options = methods.setActiveFilters(this, options);
+                        defaults = methods.setActiveFilters(this, defaults);
 
-                        success = filters.filter(options);
+                        success = filters.filter(defaults);
 
-                        if (options.done)
+                        if (defaults.done)
                         {
                             defaults.onClickCategory = null;
-                            options.done(success);
+                            defaults.done(success);
                         }
 
                     });
@@ -445,6 +445,10 @@
             {
                 methods.resetCache();
                 filters.countAttributesForFilter(defaults, 'onfilter');
+            },
+            setFilterCount: function (categoriesCnt)
+            {
+                filters.setAttributeCount(categoriesCnt,'onfilter');
             },
             restartFilter : function()
             {
