@@ -1,5 +1,6 @@
 #jQuery Content Filtering (jaFilter)
    - A jQuery plugin for content filtering
+   http://iany00.github.io/ja-filter/
 
 ##Instructions
 
