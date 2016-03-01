@@ -74,12 +74,23 @@
                     $.each(options.activeFilters, function(key, value) {
                         if (options.filtersInDepth.length > 0 && $.inArray(key, options.filtersInDepth) != -1) // depth filters
                         {
-                            inFilterRange = filters.depthFilter(itemRow, key, options);
-                            //if (!inFilterRange) {
-                            //    return false;
-                            //}
+                            if(options.activeFilters[key].length > 0)
+                            {
+                                inFilterRange = filters.depthFilter(itemRow, key, options);
+                                if (!inFilterRange)
+                                {
+                                    return false;
+                                }
+                            } else
+                            {
+                                itemRow.find('[data-' + key + ']').each(function()
+                                {
+                                    $(this).removeClass(notInRange);
+                                });
+                            }
                         } else {
-                            if (options.activeFilters[key].length > 0) {
+                            if (options.activeFilters[key].length > 0)
+                            {
                                 if (typeof itemData[key] == "undefined" && options.hideOnlyAvailableData) {
                                     inFilterRange = true;
                                 }
@@ -147,7 +158,7 @@
             },
             depthFilter: function(itemRow, dataAttr, options) {
                 var notInRange = options.notInRange;
-                var inFilterRange = true;
+                var inFilterRange = false;
 
                 itemRow.find('[data-' + dataAttr + ']').each(function() {
                     var $this = $(this);
@@ -159,9 +170,8 @@
                     {
                         $this.removeClass(notInRange);
                         inFilterRange = true;
-                    } else if (options.activeFilters[dataAttr].length > 0 && $.inArray(thisData, options.activeFilters[dataAttr]) == -1) {
+                    } else if ($.inArray(thisData, options.activeFilters[dataAttr]) == -1) {
                         $this.addClass(notInRange);
-                        inFilterRange = false;
                     } else {
                         $this.removeClass(notInRange);
                         inFilterRange = true;
