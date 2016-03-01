@@ -87,17 +87,17 @@ $(<span class="pl-s"><span class="pl-pds">'</span>#filter<span class="pl-pds">'<
 <hr>
 
 <h2>
-<a id="fiddle-demo" class="anchor" href="#fiddle-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fiddle Demo:</h2>
+<a id="fiddle-demo" class="anchor" href="#fiddle-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demo:</h2>
 
 <div id="filter" style="float: left;">
     <div class="col-xs-6">
         <h3 class="text-center">Stars</h3>
         <div class="well" style="max-height: 300px;overflow: auto;">
             <ul class="list-group checked-list-box">
-              <li><input type="checkbox" data-jafilter="star" value="1" />Star 1 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="star" value="2" />Star 2 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="star" value="3" />Star 3 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="star" value="4" />Star 4 - (<span>0</span>)</li>
+              <li><input type="checkbox" data-jafilter="star" value="1" id="star1" /><label for="star1">Star 1 - (<span>0</span>)</label></li>
+              <li><input type="checkbox" data-jafilter="star" value="2" id="star2" /><label for="star2">Star 2 - (<span>0</span>)</label></li>
+              <li><input type="checkbox" data-jafilter="star" value="3" id="star3" /><label for="star3">Star 3 - (<span>0</span>)</label></li>
+              <li><input type="checkbox" data-jafilter="star" value="4" id="star4" /><label for="star4">Star 4 - (<span>0</span>)</label></li>
             </ul>
         </div>
     </div>
@@ -105,10 +105,10 @@ $(<span class="pl-s"><span class="pl-pds">'</span>#filter<span class="pl-pds">'<
         <h3 class="text-center">Color</h3>
         <div class="well" style="max-height: 300px;overflow: auto;">
             <ul id="check-list-box" class="list-group checked-list-box">
-               <li><input type="checkbox" data-jafilter="color" value="1" />Color 1 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="color" value="10" />Color 10 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="color" value="20" />Color 20 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="color" value="30" />Color 30 - (<span>0</span>)</li>
+               <li><input type="checkbox" data-jafilter="color" value="1" id="color1" /><label for="color1">Color 1 - (<span>0</span>)</label></li>
+              <li><input type="checkbox" data-jafilter="color" value="10" id="color10" /><label for="color10">Color 10 - (<span>0</span>)</label></li>
+              <li><input type="checkbox" data-jafilter="color" value="20" id="color20" /><label for="color20">Color 20 - (<span>0</span>)</label></li>
+              <li><input type="checkbox" data-jafilter="color" value="30" id="color30" /><label for="color30">Color 30 - (<span>0</span>)</label></li>
             </ul>
         </div>
     </div>
@@ -116,16 +116,16 @@ $(<span class="pl-s"><span class="pl-pds">'</span>#filter<span class="pl-pds">'<
         <h3 class="text-center">Board</h3>
         <div class="well" style="max-height: 300px;overflow: auto;">
             <ul class="list-group checked-list-box">
-               <li><input type="checkbox" data-jafilter="board" value="1" />Board 1 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="board" value="3" />Board 3 - (<span>0</span>)</li>
-              <li><input type="checkbox" data-jafilter="board" value="7" />Board 7 - (<span>0</span>)</li>
+               <li><input type="checkbox" data-jafilter="board" value="1" id="board1" /><label for="board1">Board 1 - (<span>0</span>)</label></li>
+              <li><input type="checkbox" data-jafilter="board" value="3" id="board3" /><label for="board3">Board 3 - (<span>0</span>)</label></li>
+              <li><input type="checkbox" data-jafilter="board" value="7" id="board7" /><label for="board7">Board 7 - (<span>0</span>)</label></li>
 
             </ul>
         </div>
     </div>
 </div>
 
-<div id="container" style="  float: left;font-size: 15px;  margin-left: 200px;">
+<div id="container" style="  font-size: 15px;  margin-left: 200px; min-height: 500px;">
     <div class="result_row" data-star="1" data-color = "1" data-location = "5" style="border: 1px solid #000; padding: 10px; width: 300px;">
         <p>star = 1 <br/>color = 1 <br/>location = 5 </p>
     </div>
@@ -178,6 +178,8 @@ $(<span class="pl-s"><span class="pl-pds">'</span>#filter<span class="pl-pds">'<
             <li class="innerRow" data-board = "1"> <p>board = 1 </p></li>
         </ul>
     </div>
+
+
 
 
 </div>
